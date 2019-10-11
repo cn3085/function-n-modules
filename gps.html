@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script>
+        var myPosition = {};
+        //서울시청 좌표
+        var targetPosition = {
+            latitude : 37.566504, 
+            longitude : 126.978479
+        }
+        function getLocation() {
+            if (navigator.geolocation) { // GPS를 지원하면
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        console.log(position.coords.latitude + ' ' + position.coords.longitude);
+                        console.log(position);
+                        myPosition = position.coords;
+                        
+                        var distance = computeDistance(myPosition, targetPosition);
+                        console.log('거리는 '+ distance + 'km 입니다.')
+                },
+                function(err){
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                        x.innerHTML = "User denied the request for Geolocation."
+                        break;
+                        case error.POSITION_UNAVAILABLE:
+                        x.innerHTML = "Location information is unavailable."
+                        break;
+                        case error.TIMEOUT:
+                        x.innerHTML = "The request to get user location timed out."
+                        break;
+                        case error.UNKNOWN_ERROR:
+                        x.innerHTML = "An unknown error occurred."
+                        break;
+                    }
+                },
+                {
+                enableHighAccuracy: true, // 전력 소모를 더 해서 정확한 위치를 찾아낸다.
+                maximumAge: 0, //한번 찾을 위치 정보를 해당 초만큼 캐싱
+                timeout: Infinity // 주어진 초 안에 찾지 못하면 에러 발생
+                }
+            );
+        } else {
+            alert('GPS를 지원하지 않습니다');
+        }
+    }
+    getLocation();
+
+    // 구면 코사인 법칙(Spherical Law of Cosine) 으로 두 위도/경도 지점의 거리를 구함
+    // 반환 거리 단위 (km)
+    function computeDistance(startCoords, destCoords) {
+        var startLatRads = degreesToRadians(startCoords.latitude);
+        var startLongRads = degreesToRadians(startCoords.longitude);
+        var destLatRads = degreesToRadians(destCoords.latitude);
+        var destLongRads = degreesToRadians(destCoords.longitude);
+
+        var Radius = 6371; //지구의 반경(km)
+        var distance = Math.acos(Math.sin(startLatRads) * Math.sin(destLatRads) + 
+                        Math.cos(startLatRads) * Math.cos(destLatRads) *
+                        Math.cos(startLongRads - destLongRads)) * Radius;
+
+        return distance;
+    }
+
+    function degreesToRadians(degrees) {
+        radians = (degrees * Math.PI)/180;
+        return radians;
+    }
+
+    // 거리 계산
+    </script>
+</head>
+<body>
+    정보 제공을 동의하면 개발자 도구의 콘솔에 위치 정보가 출력됩니다.
+</body>
+</html>
